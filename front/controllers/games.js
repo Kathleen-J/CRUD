@@ -5,6 +5,7 @@ const {NotFoundError, InappropriateActionError} = require('../errors');
 module.exports = {
   getGames: async (req, res)   => {
     const db = knex(config.development.database);
+    const role = req.user.role;
     const games = await db
       .select({
         id: 'g.id',
