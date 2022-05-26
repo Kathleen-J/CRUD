@@ -18,6 +18,7 @@ export default async(goTo) => {
 
   //1 (read)
   // Заменить на вызов API (получение данных)
+  //Заменить на fetch('/api/players');
   const response = await fetch('/api/players?status=all');
   const users = await response.json();
   const template = document.createElement('template');
@@ -80,7 +81,7 @@ export default async(goTo) => {
             fetch(`/api/players/${event.target.dataset.id}`,
               {
                 method: 'DELETE',
-                body: JSON.stringify({playerId: event.target.dataset.id, statusUser: 'deleted'}),
+                body: JSON.stringify({playerId: event.target.dataset.id}),
                 headers: {
                   'Content-Type': 'application/json'
                 }

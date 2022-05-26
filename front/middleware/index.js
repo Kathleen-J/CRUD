@@ -1,5 +1,8 @@
-const catchErrors = require('./catcher');
+const catchErrors = require('./catchErrors');
+const {  isAdminOrUser, isAdmin } = require('./checkRoles');
 
 module.exports = {
-  catchErrors
+  catchErrors,
+  isAdmin,
+  isAdminOrUser
 };

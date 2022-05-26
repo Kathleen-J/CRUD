@@ -1,14 +1,22 @@
 const knex = require('knex');
 const bcrypt = require('bcrypt');
 const config = require('../../configs');
-const {NotFoundError, InappropriateActionError} = require('../errors');
+const {NotFoundError, InappropriateActionError, Forbidden} = require('../errors');
+const {getRoleByLogin} = require('./users');
 
 module.exports = {
 
   getPlayers: async (req, res) => {
     const status = req.query.status;
+    const {login, password} = req.body;
+    const {role} = await getRoleByLogin(login);
+    const db = await knex(config.development.database);
 
-      const db = await knex(config.development.database);
+    //если это Админ и в параметрах передано значене status = 'all' => отобразятся все игроки
+    //если это Админ и status !== 'all' или, если это пользователь => отобразятся активные игроки
+
+    if (role === 'Admin' && status === 'all') {
+
       const query = db
         .select({
           id: 'u.id',
@@ -17,14 +25,32 @@ module.exports = {
           createdAt: 'u.created_at',
           updatedAt: 'u.updated_at'
         })
-        .from({u: 'users'})
+        .from({u: 'users'});
 
-        if (status !== 'all') {
-          query.where({'u.status': 'active'});
-        }
+      const users = await query;
+      res.status(200).json(users);
 
-        const users = await query;
-        res.status(200).json(users);
+    } else if ( (role === 'Admin' && status !== 'all') || (role === 'User') ) {
+
+      const query = db
+        .select({
+          id: 'u.id',
+          login: 'u.login',
+          status: 'u.status',
+          createdAt: 'u.created_at',
+          updatedAt: 'u.updated_at'
+        })
+      .from({u: 'users'})
+      .where({'u.status': 'active'});
+
+      const users = await query;
+      res.status(200).json(users);
+
+    } else {
+
+      throw new Forbidden('Not enough rights');
+    }
+
   },
 
   deletePlayer: async (req, res) => {
@@ -88,7 +114,8 @@ module.exports = {
         password: await bcrypt.hash(passWord, 8),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        status: statusUser
+        status: statusUser,
+        role: 'User'
       }]);
       res.status(200).json({loginUser});
 
@@ -102,7 +129,8 @@ module.exports = {
           password: await bcrypt.hash(passWord, 8),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          status: statusUser
+          status: statusUser,
+          role: 'User'
         }]);
         res.status(200).json({loginUser});
 
