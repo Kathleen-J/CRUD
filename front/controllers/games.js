@@ -34,7 +34,7 @@ module.exports = {
 
     } else if ( (role === 'Admin' && status !== 'all') || (role === 'User') ) {
 
-      const games = await db
+      const [games] = await db
         .select({
           id: 'g.id',
           winner: 'g.winner',
