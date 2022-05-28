@@ -21,7 +21,7 @@ const strategy = new Strategy(
   async (payload, done) => {
    try {
      const user = await getUserId(payload.sub);
-     //const user = await getUserId(payload.sub.id);
+    //  const user = await getUserId(payload.sub.id);
      if (user) {
        done(null, user);
      } else {

@@ -8,8 +8,7 @@ module.exports = {
 
   getPlayers: async (req, res) => {
     const status = req.query.status;
-    const {login, password} = req.body;
-    const {role} = await getRoleByLogin(login);
+    const {login, role} = req.user;
     const db = await knex(config.development.database);
 
     //если это Админ и в параметрах передано значене status = 'all' => отобразятся все игроки

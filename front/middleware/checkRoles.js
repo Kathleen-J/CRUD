@@ -3,7 +3,7 @@ const {Forbidden, Unauthorized} = require('../errors');
 
 const isAdmin = async (req, res, next) => {
 
-  const {login, password} = req.body;
+  const {login, password} = req.user;
   const {role} = await getRoleByLogin(login);
 
    if (role === 'Admin') {
